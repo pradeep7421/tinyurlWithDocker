@@ -48,5 +48,5 @@ public class TinyurlController {
 	@GetMapping("findAllEntity")
 	public ResponseEntity<List<ShortURLEntity>> getAllUrls() {
         return ResponseEntity.ok(tinyUrlService.getAllUrls());
-    }
+    } 
 }
