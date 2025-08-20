@@ -14,22 +14,22 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.tinyurl.docker.model.ShortURLEntity;
+import com.tinyurl.docker.model.ShortURLEntity2;
 import com.tinyurl.docker.model.ShortURLModel;
-import com.tinyurl.docker.service.TinyUrlService;
+import com.tinyurl.docker.service.TinyUrlService2;
 
 
 @RestController
-@RequestMapping("${controller1.sub-path}")
-public class TinyurlController {
+@RequestMapping("${controller2.sub-path}/")
+public class TinyurlController2 {
 	@Resource
-	private TinyUrlService tinyUrlService;
+	private TinyUrlService2 tinyUrlService2;
 
 	@PostMapping("/create")
 	public ResponseEntity<String> createURL(@RequestBody ShortURLModel shortUrlModel) throws NoSuchAlgorithmException {
 		System.out.println("Controller --->" + shortUrlModel);
 		try {
-		String key = tinyUrlService.createShortUrl(shortUrlModel);
+		String key = tinyUrlService2.createShortUrl(shortUrlModel);
 //			String key= "uq1wr";
 		return ResponseEntity.ok("http://localhost:9999/" + key);
 		}catch(RuntimeException e) {
@@ -41,12 +41,12 @@ public class TinyurlController {
 	@GetMapping("/getOriginalUrl/{shortKey}")
 	public ResponseEntity<String> getOriginalUrlByShortKey(@PathVariable("shortKey") String shortKey) {
 		System.out.println("Controller --->" + shortKey);
-		String originalUrl = tinyUrlService.getOriginalUrl(shortKey);
+		String originalUrl = tinyUrlService2.getOriginalUrl(shortKey);
 		return ResponseEntity.ok(originalUrl);
 //		return ResponseEntity.ok("https://www.geeksforgeeks.org/");
 	}
 	@GetMapping("/findAllEntity")
-	public ResponseEntity<List<ShortURLEntity>> getAllUrls() {
-        return ResponseEntity.ok(tinyUrlService.getAllUrls());
+	public ResponseEntity<List<ShortURLEntity2>> getAllUrls() {
+        return ResponseEntity.ok(tinyUrlService2.getAllUrls());
     } 
 }
