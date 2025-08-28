@@ -7,8 +7,11 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - tinyurl-net  
     volumes: 
       - mongo_data:/data/db
+#     - D:\InterviewWorkspace\DataDB-volume:/test/data #hostLocation:containerLocation
 
 
   mongo-express:
@@ -19,6 +22,8 @@ services:
      ME_CONFIG_MONGODB_ADMINUSERNAME: root
      ME_CONFIG_MONGODB_ADMINPASSWORD: root
      ME_CONFIG_MONGODB_URL: "mongodb://root:root@mongo:27017/"  
+    networks:
+      - tinyurl-net  
 
   mysql-older:
     image: mysql:8.0
@@ -29,6 +34,8 @@ services:
       MYSQL_DATABASE: tiny_url
     ports:
       - "3307:3306"
+    networks:
+      - tinyurl-net  
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -41,9 +48,12 @@ services:
     restart: always
     ports:
       - "8083:8080"
+    networks:
+      - tinyurl-net  
 volumes: 
   mongo_data: 
   mysql_data:
+  
 #   tinyurlapp:
 #     build: .
 #     ports:
@@ -55,3 +65,9 @@ volumes:
     # depends_on:
     #   mongo:
     #     condition: service_healthy  
+    # networks:
+    #   - tinyurl-net
+
+networks:
+  tinyurl-net:
+    driver: bridge  

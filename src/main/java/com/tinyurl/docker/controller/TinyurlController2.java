@@ -20,7 +20,7 @@ import com.tinyurl.docker.service.TinyUrlService2;
 
 
 @RestController
-@RequestMapping("${controller2.sub-path}/")
+@RequestMapping("${controller2.sub-path}")
 public class TinyurlController2 {
 	@Resource
 	private TinyUrlService2 tinyUrlService2;

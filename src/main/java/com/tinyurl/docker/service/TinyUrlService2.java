@@ -29,7 +29,7 @@ public class TinyUrlService2 {
 				.digest(shortUrlModel.getOriginalUrl().getBytes(StandardCharsets.UTF_8));
 		String key = Base64.getUrlEncoder().withoutPadding().encodeToString(hash).substring(0, 6);
 		// Boolean isKeyExist = tinyUrlRepository.existsById(key);
-		Boolean isKeyExist = tinyUrlRepositoryMysql.existsById(key);
+		Boolean isKeyExist = tinyUrlRepositoryMysql.existsByShortKey(key);
 //		if (isCustomAliasValid) {
 			if (isKeyExist) {
 				throw new RuntimeException("Custom alias or key already taken.");

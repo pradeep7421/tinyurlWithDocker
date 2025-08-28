@@ -18,7 +18,7 @@ public interface TinyUrlRepositoryMysql extends JpaRepository<ShortURLEntity2, L
 	ShortURLEntity2 findByOriginalUrl(@Param("originalUrl")String originalUrl);
 
 	@Query("SELECT CASE WHEN COUNT(s) > 0 THEN true ELSE false END FROM ShortURLEntity2 s WHERE s.shortKey = :shortKey")
-	boolean existsById(@Param("shortKey")String key);
+	boolean existsByShortKey(@Param("shortKey")String key);
 
 	@Query("SELECT s FROM ShortURLEntity2 s WHERE s.shortKey = :shortKey")
 	Optional<ShortURLEntity2> findByShortKey(@Param("shortKey")String shortKey);
