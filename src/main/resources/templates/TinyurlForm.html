@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <title>Create Short URL</title>
+</head>
+<body>
+  <h1>Create Short URL</h1>
+
+  <!-- Dynamic form action -->
+  <form th:action="@{${controllerSubPath} + '/createUrlDualType'}" method="post">
+    <label>API Dev Key:
+      <input type="text" name="apiDevKey" required>
+    </label>
+    <br><br>
+
+    <label>Original URL:
+      <input type="url" name="originalUrl" required>
+    </label>
+    <br><br>
+
+    <label>Custom Alias:
+      <input type="text" name="customAlias">
+    </label>
+    <br><br>
+
+    <label>User Name:
+      <input type="text" name="userName" required>
+    </label>
+    <br><br>
+
+    <button type="submit">Submit</button>
+  </form>
+</body>
+</html>
