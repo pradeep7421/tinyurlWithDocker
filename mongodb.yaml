@@ -2,7 +2,7 @@ version:  "3.8"
 services:
   mongo:
     image:  mongo
-    container_name: mongo-express
+    container_name: mongo
     ports:
       - "27018:27017"
     environment:
@@ -49,12 +49,12 @@ services:
     container_name: adminer
     restart: always
     ports:
-      - "8070:8080"
+      - "8072:8080"
     networks:
       - tinyurl-net  
-volumes: 
-  mongo_data: 
-  mysql_data:
+# volumes: 
+#   mongo_data: 
+#   mysql_data:
   
 #   tinyurlapp:
 #     build: .
@@ -77,13 +77,17 @@ volumes:
     privileged: true
     user: root
     ports:
-      - "8080:8080"   # Jenkins UI
+      - "8070:8080"   # Jenkins UI
       - "50000:50000" # For Jenkins agents
     volumes:
       - ./jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - tinyurl-net  
+
+volumes: 
+  mongo_data: 
+  mysql_data:
 
 networks:
   tinyurl-net:
