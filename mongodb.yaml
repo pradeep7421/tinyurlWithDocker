@@ -51,7 +51,22 @@ services:
     ports:
       - "8072:8080"
     networks:
-      - tinyurl-net  
+      - tinyurl-net 
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    container_name: jenkins
+    restart: unless-stopped
+    privileged: true
+    user: root
+    ports:
+      - "8070:8080"   # Jenkins UI
+      - "50000:50000" # For Jenkins agents
+    volumes:
+      - ./jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - tinyurl-net      
 # volumes: 
 #   mongo_data: 
 #   mysql_data:
@@ -69,21 +84,6 @@ services:
     #     condition: service_healthy  
     # networks:
     #   - tinyurl-net
-
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    restart: unless-stopped
-    privileged: true
-    user: root
-    ports:
-      - "8070:8080"   # Jenkins UI
-      - "50000:50000" # For Jenkins agents
-    volumes:
-      - ./jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - tinyurl-net  
 
 volumes: 
   mongo_data: 
