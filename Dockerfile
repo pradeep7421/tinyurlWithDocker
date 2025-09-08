@@ -4,5 +4,4 @@ WORKDIR /app
 
 COPY target/tinyurl-demo.jar app.jar
 
-ENTRYPOINT ["java","-jar","app.jar","--spring.profiles.active=${SPRING_PROFILE:dev}"]
-
+ENTRYPOINT ["java","-jar","app.jar"]
