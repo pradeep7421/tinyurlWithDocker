@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/pradeep7421/tinyurlWithDocker.git', branch: "${env.BRANCH_NAME}"
+                git url: 'https://github.com/pradeep7421/tinyurlWithDocker.git', branch: "${env.BRANCH_NAME}", credentialsId: 'github-cred'
             }
         }
 
