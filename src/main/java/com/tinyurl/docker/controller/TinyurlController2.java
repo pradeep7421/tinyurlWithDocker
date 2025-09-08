@@ -7,9 +7,10 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinyurl.docker.model.ShortURLEntity2;
@@ -28,13 +29,26 @@ import com.tinyurl.docker.service.TinyUrlService2;
 @RestController
 @RequestMapping("${controller2.sub-path}")
 public class TinyurlController2 {
+	@Value("${controller2.sub-path}")
+	private String controller2SubPath;
+	 
 	@Resource
 	private TinyUrlService2 tinyUrlService2;
 
-	  @GetMapping
-	    public RedirectView redirectToForm() {
-	        return new RedirectView("/tinyurl/TinyurlForm.html");
-	    }
+//  without Thymeleaf and if html file is in static folder
+//	  @GetMapping
+//	    public RedirectView redirectToForm() {
+//	        return new RedirectView("/tinyurl/TinyurlForm.html");
+//	    }
+	
+//  with Thymeleaf and if html file is in template folder	
+    @GetMapping
+    public ModelAndView showForm() {
+        ModelAndView mv = new ModelAndView("TinyurlForm"); // resolves TinyurlForm.html in /templates
+        System.out.println(controller2SubPath);
+        mv.addObject("controllerSubPath", controller2SubPath);
+        return mv;
+    }
 
 	// For JSON API clients
 	  @PostMapping(value = "/createUrl", consumes = "application/json")

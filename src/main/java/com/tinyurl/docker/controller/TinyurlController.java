@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.view.RedirectView;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tinyurl.docker.model.ShortURLEntity;
@@ -27,13 +28,24 @@ import com.tinyurl.docker.service.TinyUrlService;
 @RestController
 @RequestMapping("${controller1.sub-path}")
 public class TinyurlController {
+	
+	@Value("${controller1.sub-path}")
+    private String controller1SubPath;
+
 	@Resource
 	private TinyUrlService tinyUrlService;
 
-	@GetMapping
-	public RedirectView redirectToForm() {
-		return new RedirectView("/tinyurl/TinyurlForm.html");
-	}
+//	@GetMapping
+//	public RedirectView redirectToForm() {
+//		return new RedirectView("/tinyurl/TinyurlForm.html");
+//	}
+    @GetMapping
+    public ModelAndView showForm() {
+        ModelAndView mv = new ModelAndView("TinyurlForm"); // resolves TinyurlForm.html in /templates
+        mv.addObject("controllerSubPath", controller1SubPath);
+        return mv;
+    }
+
 
 	// For JSON API clients
 	@PostMapping(value = "/createUrl", consumes = "application/json")
