@@ -51,7 +51,7 @@ public class TinyurlController {
 	@PostMapping(value = "/createUrl", consumes = "application/json")
 	public ResponseEntity<String> createUrlJson(@RequestBody ShortURLModel shortUrlModel)
 			throws NoSuchAlgorithmException {
-		System.out.println("JSON ---> " + shortUrlModel);
+		System.out.println("JSON --------> " + shortUrlModel);
 		try {
 			String key = tinyUrlService.createShortUrl(shortUrlModel);
 			return ResponseEntity.ok("http://localhost:9999/" + key);
