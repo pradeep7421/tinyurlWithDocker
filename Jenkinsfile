@@ -2,34 +2,38 @@ pipeline {
     agent any
 
     environment {
-        // Your DockerHub repo
         DOCKER_IMAGE = "pradeep7421/devtinyurlwithdocker"
     }
 
-    stages {
+    triggers {
+        githubPush()
+    }
 
+    stages {
         stage('Checkout') {
             steps {
-                git branch: 'master', url: 'https://github.com/pradeep7421/tinyurlWithDocker.git'
+                git url: 'https://github.com/pradeep7421/tinyurlWithDocker.git', branch: "${env.BRANCH_NAME}"
             }
         }
 
         stage('Build JAR') {
+            when {
+                expression { env.BRANCH_NAME.startsWith("development") || env.BRANCH_NAME == "master" }
+            }
             steps {
-                // Assuming Maven project
+                sh 'echo "Building branch: $BRANCH_NAME"'
                 sh 'mvn clean package -DskipTests'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build & Push Docker Image') {
+            when {
+                branch 'master'
+            }
             steps {
                 sh 'docker build -t $DOCKER_IMAGE:${BUILD_NUMBER} .'
                 sh 'docker tag $DOCKER_IMAGE:${BUILD_NUMBER} $DOCKER_IMAGE:latest'
-            }
-        }
 
-        stage('Push Docker Image') {
-            steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub-cred', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
                     sh 'echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin'
                     sh 'docker push $DOCKER_IMAGE:${BUILD_NUMBER}'
@@ -39,10 +43,15 @@ pipeline {
         }
 
         stage('Deploy to Dev') {
+            when {
+                branch 'master'
+            }
             steps {
                 sh '''
                   docker rm -f tinyurl-dev || true
-                  docker run -d --name tinyurl-dev -p 8081:8080 \
+                  docker run -d --name tinyurl-dev \
+                    --network=tinyurl-net \
+                    -p 8081:8080 \
                     -e SPRING_PROFILES_ACTIVE=dev \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
                 '''
@@ -50,11 +59,16 @@ pipeline {
         }
 
         stage('Deploy to QA') {
+            when {
+                branch 'master'
+            }
             steps {
-                input message: "Deploy to QA?"
+                input message: "Promote to QA?"
                 sh '''
                   docker rm -f tinyurl-qa || true
-                  docker run -d --name tinyurl-qa -p 8082:8080 \
+                  docker run -d --name tinyurl-qa \
+                    --network=tinyurl-net \
+                    -p 8082:8080 \
                     -e SPRING_PROFILES_ACTIVE=qa \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
                 '''
@@ -62,11 +76,16 @@ pipeline {
         }
 
         stage('Deploy to UAT') {
+            when {
+                branch 'master'
+            }
             steps {
-                input message: "Deploy to UAT?"
+                input message: "Promote to UAT?"
                 sh '''
                   docker rm -f tinyurl-uat || true
-                  docker run -d --name tinyurl-uat -p 8083:8080 \
+                  docker run -d --name tinyurl-uat \
+                    --network=tinyurl-net \
+                    -p 8083:8080 \
                     -e SPRING_PROFILES_ACTIVE=uat \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
                 '''
@@ -74,25 +93,26 @@ pipeline {
         }
 
         stage('Deploy to Prod') {
+            when {
+                branch 'master'
+            }
             steps {
-                input message: "Deploy to Prod?"
+                input message: "Promote to Prod?"
                 sh '''
                   docker rm -f tinyurl-prod || true
-                  docker run -d --name tinyurl-prod -p 8080:8080 \
+                  docker run -d --name tinyurl-prod \
+                    --network=tinyurl-net \
+                    -p 8080:8080 \
                     -e SPRING_PROFILES_ACTIVE=prod \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
                 '''
             }
         }
-
     }
 
     post {
         always {
-            echo "Pipeline finished. Build #${BUILD_NUMBER}"
-        }
-        failure {
-            echo "Build failed! Check Jenkins logs."
+            echo "Pipeline finished. Branch=${env.BRANCH_NAME}, Build #${BUILD_NUMBER}"
         }
     }
 }
