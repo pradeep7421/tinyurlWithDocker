@@ -103,7 +103,7 @@ pipeline {
                   docker run -d --name tinyurl-prod \
                     --network=root_tinyurl-net \
                     -p 8080:8080 \
-                    -e SPRING_PROFILES_ACTIVE=prod \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
                 '''
             }
