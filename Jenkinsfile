@@ -71,7 +71,7 @@ pipeline {
                 sh '''
                   docker rm -f tinyurl-dev || true
                   docker run -d --name tinyurl-dev \
-                    --network=tinyurl-net \
+                    --network=root_tinyurl-net \
                     -p 8081:8080 \
                     -e SPRING_PROFILES_ACTIVE=dev \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -86,7 +86,7 @@ pipeline {
                 sh '''
                   docker rm -f tinyurl-qa || true
                   docker run -d --name tinyurl-qa \
-                    --network=tinyurl-net \
+                    --network=root_tinyurl-net \
                     -p 8082:8080 \
                     -e SPRING_PROFILES_ACTIVE=qa \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -101,7 +101,7 @@ pipeline {
                 sh '''
                   docker rm -f tinyurl-uat || true
                   docker run -d --name tinyurl-uat \
-                    --network=tinyurl-net \
+                    --network=root_tinyurl-net \
                     -p 8083:8080 \
                     -e SPRING_PROFILES_ACTIVE=uat \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -116,7 +116,7 @@ pipeline {
                 sh '''
                   docker rm -f tinyurl-prod || true
                   docker run -d --name tinyurl-prod \
-                    --network=tinyurl-net \
+                    --network=root_tinyurl-net \
                     -p 8080:8080 \
                     -e SPRING_PROFILES_ACTIVE=proddocker \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
