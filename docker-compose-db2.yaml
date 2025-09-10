@@ -61,4 +61,5 @@ volumes:
 
 networks:
   tinyurl-net:
-    driver: bridge
+    external: true
+    name: root_tinyurl-net
