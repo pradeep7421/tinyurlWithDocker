@@ -1,8 +1,14 @@
-pipeline {
+pipeline { 
     agent any
 
     environment {
         DOCKER_IMAGE = "pradeep7421/devtinyurlwithdocker"
+        COMPOSE_FILE = "docker-compose-db2.yaml"
+    }
+
+    tools {
+        maven 'Maven3'
+        jdk 'JDK21'
     }
 
     triggers {
@@ -12,7 +18,21 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git url: 'https://github.com/pradeep7421/tinyurlWithDocker.git', branch: "${env.BRANCH_NAME}", credentialsId: 'github-cred'
+                git url: 'https://github.com/pradeep7421/tinyurlWithDocker.git',
+                    branch: "${env.BRANCH_NAME}",
+                    credentialsId: 'github-cred'
+            }
+        }
+
+        stage('Start Db (Mongo, MySQL, etc)') {
+            steps {
+                sh '''
+                    echo "[INFO] Shutting down existing containers (if any)..."
+                    docker-compose -f $COMPOSE_FILE down
+
+                    echo "[INFO] Starting db containers..."
+                    docker-compose -f $COMPOSE_FILE up -d
+                '''
             }
         }
 
@@ -21,7 +41,6 @@ pipeline {
                 expression { env.BRANCH_NAME.startsWith("development") || env.BRANCH_NAME == "master" }
             }
             steps {
-                sh 'echo "Building branch: $BRANCH_NAME"'
                 sh 'mvn clean package -DskipTests'
             }
         }
@@ -43,14 +62,12 @@ pipeline {
         }
 
         stage('Deploy to Dev') {
-            when {
-                branch 'master'
-            }
+            when { branch 'master' }
             steps {
                 sh '''
                   docker rm -f tinyurl-dev || true
                   docker run -d --name tinyurl-dev \
-                    --network=root_tinyurl-net \
+                    --network=tinyurl-net \
                     -p 8081:8080 \
                     -e SPRING_PROFILES_ACTIVE=dev \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -59,15 +76,13 @@ pipeline {
         }
 
         stage('Deploy to QA') {
-            when {
-                branch 'master'
-            }
+            when { branch 'master' }
             steps {
                 input message: "Promote to QA?"
                 sh '''
                   docker rm -f tinyurl-qa || true
                   docker run -d --name tinyurl-qa \
-                    --network=root_tinyurl-net \
+                    --network=tinyurl-net \
                     -p 8082:8080 \
                     -e SPRING_PROFILES_ACTIVE=qa \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -76,15 +91,13 @@ pipeline {
         }
 
         stage('Deploy to UAT') {
-            when {
-                branch 'master'
-            }
+            when { branch 'master' }
             steps {
                 input message: "Promote to UAT?"
                 sh '''
                   docker rm -f tinyurl-uat || true
                   docker run -d --name tinyurl-uat \
-                    --network=root_tinyurl-net \
+                    --network=tinyurl-net \
                     -p 8083:8080 \
                     -e SPRING_PROFILES_ACTIVE=uat \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -93,15 +106,13 @@ pipeline {
         }
 
         stage('Deploy to Prod') {
-            when {
-                branch 'master'
-            }
+            when { branch 'master' }
             steps {
                 input message: "Promote to Prod?"
                 sh '''
                   docker rm -f tinyurl-prod || true
                   docker run -d --name tinyurl-prod \
-                    --network=root_tinyurl-net \
+                    --network=tinyurl-net \
                     -p 8080:8080 \
                     -e SPRING_PROFILES_ACTIVE=proddocker \
                     $DOCKER_IMAGE:${BUILD_NUMBER}
@@ -116,3 +127,4 @@ pipeline {
         }
     }
 }
+

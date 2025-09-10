@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo
+    container_name: mongo
+    restart: always
+    ports:
+      - "27018:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    networks:
+      - tinyurl-net
+    volumes: 
+      - mongo_data:/data/db
+#     - D:\InterviewWorkspace\DataDB-volume:/test/data #hostLocation:containerLocation
+
+
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8071:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+      ME_CONFIG_MONGODB_URL: "mongodb://root:root@mongo:27017/"
+    networks:
+      - tinyurl-net
+    depends_on:
+      - mongo
+
+  mysql-older:
+    image: mysql:8.0
+    container_name: mysql-older
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: tiny_url
+    ports:
+      - "3307:3306"
+    networks:
+      - tinyurl-net
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8072:8080"
+    networks:
+      - tinyurl-net
+
+volumes:
+  mongo_data:
+  mysql_data:
+
+networks:
+  tinyurl-net:
+    driver: bridge
