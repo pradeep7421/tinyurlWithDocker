@@ -31,7 +31,7 @@ pipeline {
                     docker-compose -f $COMPOSE_FILE down
 
                     echo "[INFO] Starting db containers..."
-                    docker-compose -f $COMPOSE_FILE up -d
+                    docker compose -f $COMPOSE_FILE up -d
                 '''
             }
         }
