@@ -24,21 +24,39 @@ pipeline {
             }
         }
 
-        // Only start DB containers if master branch
-        stage('Start Db (Mongo, MySQL, etc)') {
-            when {
-                branch 'master'
-            }
-            steps {
-                sh '''
-                    echo "[INFO] Removing any existing containers..."
-                    docker rm -f mongo mongo-express adminer mysql-older || true
+ stage('Start Db (Mongo, MySQL, etc)') {
+    when {
+        branch 'master'
+    }
+    steps {
+        sh '''
+            #!/bin/bash
+            echo "[INFO] Checking if DB containers exist..."
+            
+            # List of containers you want to check
+            CONTAINERS=("mongo" "mongo-express" "adminer" "mysql-older")
+            
+            RUN_COMPOSE=false
 
-                    echo "[INFO] Starting db containers..."
-                    docker-compose -f $COMPOSE_FILE up -d
-                '''
-            }
-        }
+            for c in "${CONTAINERS[@]}"; do
+                if [ ! "$(docker ps -a -q -f name=^${c}$)" ]; then
+                    echo "[INFO] Container $c does not exist."
+                    RUN_COMPOSE=true
+                else
+                    echo "[INFO] Container $c exists."
+                fi
+            done
+
+            if [ "$RUN_COMPOSE" = true ]; then
+                echo "[INFO] Starting DB containers with docker-compose..."
+                docker-compose -f $COMPOSE_FILE up -d
+            else
+                echo "[INFO] All DB containers already exist. Skipping docker-compose."
+            fi
+        '''
+    }
+}
+
 
         stage('Build JAR') {
             when {
