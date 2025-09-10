@@ -28,7 +28,7 @@ pipeline {
             steps {
                 sh '''
                     echo "[INFO] Shutting down existing containers (if any)..."
-                    docker-compose -f $COMPOSE_FILE down
+                    docker compose -f $COMPOSE_FILE down
 
                     echo "[INFO] Starting db containers..."
                     docker compose -f $COMPOSE_FILE up -d
