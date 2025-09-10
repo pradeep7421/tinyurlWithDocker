@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "pradeep7421/devtinyurlwithdocker"
-        COMPOSE_FILE = "docker-compose-db.yaml"
+        COMPOSE_FILE = "docker-compose-db2.yaml"
     }
 
     tools {

@@ -19,3 +19,6 @@ services:
 networks:
   tinyurl-net:
     driver: bridge
+
+volumes:
+  jenkins_home:   

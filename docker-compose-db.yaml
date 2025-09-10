@@ -74,7 +74,6 @@ services:
 volumes:
   mongo_data:
   mysql_data:
-  jenkins_home:        # ✅ Persist Jenkins config & jobs
 
 networks:
   tinyurl-net:
@@ -88,97 +87,101 @@ networks:
 
 
 
-version:  "3.8"
-services:
-  mongo:
-    image:  mongo
-    container_name: mongo
-    ports:
-      - "27018:27017"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
-    networks:
-      - tinyurl-net  
-    volumes: 
-      - mongo_data:/data/db
-#     - D:\InterviewWorkspace\DataDB-volume:/test/data #hostLocation:containerLocation
 
 
-  mongo-express:
-    image:  mongo-express
-    container_name: mongo-express
-    ports:
-     - "8071:8081"
-    environment:
-     ME_CONFIG_MONGODB_ADMINUSERNAME: root
-     ME_CONFIG_MONGODB_ADMINPASSWORD: root
-     ME_CONFIG_MONGODB_URL: "mongodb://root:root@mongo:27017/"  
-    networks:
-      - tinyurl-net  
 
-  mysql-older:
-    image: mysql:8.0
-    container_name: mysql-older
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: tiny_url
-    ports:
-      - "3307:3306"
-    networks:
-      - tinyurl-net  
-    volumes:
-      - mysql_data:/var/lib/mysql
 
-  # -----------------
-  # Optional: Adminer (MySQL GUI in browser)
-  # -----------------
-  adminer:
-    image: adminer
-    container_name: adminer
-    restart: always
-    ports:
-      - "8072:8080"
-    networks:
-      - tinyurl-net 
-
-  jenkins:
-    image: jenkins/jenkins:lts
-    container_name: jenkins
-    restart: unless-stopped
-    privileged: true
-    user: root
-    ports:
-      - "8070:8080"   # Jenkins UI
-      - "50000:50000" # For Jenkins agents
-    volumes:
-      - ./jenkins_home:/var/jenkins_home
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - tinyurl-net   
-# volumes: 
-#   mongo_data: 
-#   mysql_data:
-  
-#   tinyurlapp:
-#     build: .
+# version:  "3.8"
+# services:
+#   mongo:
+#     image:  mongo
+#     container_name: mongo
 #     ports:
-#       - "8080:8080"
+#       - "27018:27017"
 #     environment:
-#       SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/tiny_url?authSource=admin
-#     depends_on:
-#       - mongo
-    # depends_on:
-    #   mongo:
-    #     condition: service_healthy  
-    # networks:
-    #   - tinyurl-net
+#       MONGO_INITDB_ROOT_USERNAME: root
+#       MONGO_INITDB_ROOT_PASSWORD: root
+#     networks:
+#       - tinyurl-net  
+#     volumes: 
+#       - mongo_data:/data/db
+# #     - D:\InterviewWorkspace\DataDB-volume:/test/data #hostLocation:containerLocation
 
-volumes:
-  mongo_data:
-  mysql_data:
 
-networks:
-  tinyurl-net:
-    driver: bridge
+#   mongo-express:
+#     image:  mongo-express
+#     container_name: mongo-express
+#     ports:
+#      - "8071:8081"
+#     environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: root
+#      ME_CONFIG_MONGODB_URL: "mongodb://root:root@mongo:27017/"  
+#     networks:
+#       - tinyurl-net  
+
+#   mysql-older:
+#     image: mysql:8.0
+#     container_name: mysql-older
+#     restart: always
+#     environment:
+#       MYSQL_ROOT_PASSWORD: root
+#       MYSQL_DATABASE: tiny_url
+#     ports:
+#       - "3307:3306"
+#     networks:
+#       - tinyurl-net  
+#     volumes:
+#       - mysql_data:/var/lib/mysql
+
+#   # -----------------
+#   # Optional: Adminer (MySQL GUI in browser)
+#   # -----------------
+#   adminer:
+#     image: adminer
+#     container_name: adminer
+#     restart: always
+#     ports:
+#       - "8072:8080"
+#     networks:
+#       - tinyurl-net 
+
+#   # jenkins:
+#   #   image: jenkins/jenkins:lts
+#   #   container_name: jenkins
+#   #   restart: unless-stopped
+#   #   privileged: true
+#   #   user: root
+#   #   ports:
+#   #     - "8070:8080"   # Jenkins UI
+#   #     - "50000:50000" # For Jenkins agents
+#   #   volumes:
+#   #     - ./jenkins_home:/var/jenkins_home
+#   #     - /var/run/docker.sock:/var/run/docker.sock
+#   #   networks:
+#   #     - tinyurl-net   
+# # volumes: 
+# #   mongo_data: 
+# #   mysql_data:
+  
+# #   tinyurlapp:
+# #     build: .
+# #     ports:
+# #       - "8080:8080"
+# #     environment:
+# #       SPRING_DATA_MONGODB_URI: mongodb://root:root@mongo:27017/tiny_url?authSource=admin
+# #     depends_on:
+# #       - mongo
+#     # depends_on:
+#     #   mongo:
+#     #     condition: service_healthy  
+#     # networks:
+#     #   - tinyurl-net
+
+# volumes:
+#   mongo_data:
+#   mysql_data:
+
+# networks:
+#   tinyurl-net:
+#     driver: bridge
