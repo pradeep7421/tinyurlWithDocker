@@ -24,11 +24,15 @@ pipeline {
             }
         }
 
+        // Only start DB containers if master branch
         stage('Start Db (Mongo, MySQL, etc)') {
+            when {
+                branch 'master'
+            }
             steps {
                 sh '''
-                    echo "[INFO] Shutting down existing containers (if any)..."
-                    docker-compose -f $COMPOSE_FILE down
+                    echo "[INFO] Removing any existing containers..."
+                    docker rm -f mongo mongo-express adminer mysql-older || true
 
                     echo "[INFO] Starting db containers..."
                     docker-compose -f $COMPOSE_FILE up -d
