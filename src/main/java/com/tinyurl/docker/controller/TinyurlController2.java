@@ -44,7 +44,7 @@ public class TinyurlController2 {
 //  with Thymeleaf and if html file is in template folder	
     @GetMapping
     public ModelAndView showForm() {
-        ModelAndView mv = new ModelAndView("TinyurlForm2Delte"); // resolves TinyurlForm.html in /templates
+        ModelAndView mv = new ModelAndView("TinyurlForm"); // resolves TinyurlForm.html in /templates
         System.out.println(controller2SubPath);
         mv.addObject("controllerSubPath", controller2SubPath);
         return mv;
