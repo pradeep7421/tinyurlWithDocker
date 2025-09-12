@@ -117,7 +117,7 @@ pipeline {
         input message: "Promote to Prod?"
        		 sh '''
          		 # Remove existing containers
-         		 docker rm -f tinyurl-prod tinyurl-prod2 tinyurl-prod3 tinyurl-prod4 tinyurl-prod5 || true
+         		 docker rm -f tinyurl-prod1 tinyurl-prod2 tinyurl-prod3 tinyurl-prod4 tinyurl-prod5 || true
 
          		 # Start 5 instances on different ports
          		 docker run -d --name tinyurl-prod1 \
