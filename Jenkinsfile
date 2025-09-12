@@ -110,19 +110,48 @@ pipeline {
         }
 
         stage('Deploy to Prod') {
-            when { branch 'master' }
-            steps {
-                input message: "Promote to Prod?"
-                sh '''
-                  docker rm -f tinyurl-prod || true
-                  docker run -d --name tinyurl-prod \
-                    --network=root_tinyurl-net \
-                    -p 8080:8080 \
-                    -e SPRING_PROFILES_ACTIVE=proddocker \
-                    $DOCKER_IMAGE:${BUILD_NUMBER}
-                '''
-            }
-        }
+    			when { 
+    			branch 'master' 
+    			}
+   		steps {
+        input message: "Promote to Prod?"
+       		 sh '''
+         		 # Remove existing containers
+         		 docker rm -f tinyurl-prod1 tinyurl-prod2 tinyurl-prod3 tinyurl-prod4 tinyurl-prod5 || true
+
+         		 # Start 5 instances on different ports
+         		 docker run -d --name tinyurl-prod1 \
+           		 --network=root_tinyurl-net \
+            	 -p 8080:8080 \
+             	 -e SPRING_PROFILES_ACTIVE=proddocker \
+                 $DOCKER_IMAGE:${BUILD_NUMBER}
+
+        	     docker run -d --name tinyurl-prod2 \
+          		 --network=root_tinyurl-net \
+            	 -p 8090:8080 \
+           		 -e SPRING_PROFILES_ACTIVE=proddocker \
+            	 $DOCKER_IMAGE:${BUILD_NUMBER}
+
+          		 docker run -d --name tinyurl-prod3 \
+            	 --network=root_tinyurl-net \
+            	 -p 8091:8080 \
+            	 -e SPRING_PROFILES_ACTIVE=proddocker \
+            	 $DOCKER_IMAGE:${BUILD_NUMBER}
+
+          		docker run -d --name tinyurl-prod4 \
+            	--network=root_tinyurl-net \
+            	-p 8092:8080 \
+            	-e SPRING_PROFILES_ACTIVE=proddocker \
+            	$DOCKER_IMAGE:${BUILD_NUMBER}
+
+          	    docker run -d --name tinyurl-prod5 \
+           	    --network=root_tinyurl-net \
+             	-p 8092:8080 \
+             	-e SPRING_PROFILES_ACTIVE=proddocker \
+             	$DOCKER_IMAGE:${BUILD_NUMBER}
+        	'''
+   			 }
+		}
     }
 
     post {
