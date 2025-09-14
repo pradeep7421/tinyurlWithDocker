@@ -154,6 +154,26 @@ pipeline {
 		}
     }
 
+		stage('Deploy to Prod on EC2') {
+ 		 steps {
+   		 input message: "Promote to Prod?"
+  		  sshagent (credentials: ['ec2-ssh-key']) {
+     		 sh '''
+       		 ssh -o StrictHostKeyChecking=no ec2-user@13.60.183.171 '
+       		    docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
+          		docker network create root_tinyurl-net &&
+        		docker rm -f tinyurl-prod5 || true &&
+         		docker run -d --name tinyurl-prod5 \
+          		--network=root_tinyurl-net \
+           		-p 8094:8080 \
+           		-e SPRING_PROFILES_ACTIVE=proddocker \
+           		pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}
+      		  '
+      		'''
+    		}
+  		}
+		}
+
     post {
         always {
             echo "Pipeline finished. Branch=${env.BRANCH_NAME}, Build #${BUILD_NUMBER}"
