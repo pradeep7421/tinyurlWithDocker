@@ -151,25 +151,26 @@ pipeline {
         }
 
         stage('Deploy to Prod on EC2') {
-            when { branch 'master' }
-            steps {
-                input message: "Promote to Prod EC2 instance?"
-                sshagent (credentials: ['ec2-ssh-key']) {
-                    sh '''
-                      ssh -o StrictHostKeyChecking=no ec2-user@51.20.93.154 '
-                        docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
-                        docker network create root_tinyurl-net &&
-                        docker rm -f tinyurl-prodec2 || true &&
-                        docker run -d --name tinyurl-prod5 \
-                          --network=root_tinyurl-net \
-                          -p 8094:8080 \
-                          -e SPRING_PROFILES_ACTIVE=proddocker \
-                          pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}
-                      '
-                    '''
-                }
-            }
-        }
+ 		   when { branch 'master' }
+   		 steps {
+     		   input message: "Promote to Prod EC2 instance?"
+      		  sshagent (credentials: ['ec2-ssh-key']) {
+        		    sh """
+        		    ssh -o StrictHostKeyChecking=no ec2-user@51.20.93.154 \\
+         		   "set -e; \\
+           		    sudo docker network inspect root_tinyurl-net >/dev/null 2>&1 || sudo docker network create root_tinyurl-net; \\
+           		    sudo docker rm -f tinyurl-prodec2 >/dev/null 2>&1 || true; \\
+           		    sudo docker pull pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}; \\
+             		sudo docker run -d --name tinyurl-prod5 \\
+               		--network=root_tinyurl-net \\
+               		-p 8094:8080 \\
+               		-e SPRING_PROFILES_ACTIVE=proddocker \\
+               		pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}"
+          		  """
+       		 }
+    		}
+		}
+
     } // <- closes stages block
 
     post {
