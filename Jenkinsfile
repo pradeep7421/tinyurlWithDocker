@@ -1,4 +1,4 @@
-pipeline { 
+pipeline {
     agent any
 
     environment {
@@ -24,7 +24,6 @@ pipeline {
             }
         }
 
-       // Only start DB containers if master branch
         stage('Start Db (Mongo, MySQL, etc)') {
             when {
                 branch 'master'
@@ -33,7 +32,7 @@ pipeline {
                 sh '''
                     echo "[INFO] Removing any existing containers..."
                     docker rm -f mongo mongo-express adminer mysql-older || true
-                    
+
                     echo "[INFO] Starting db containers..."
                     docker-compose -f $COMPOSE_FILE up -d
                 '''
@@ -110,72 +109,68 @@ pipeline {
         }
 
         stage('Deploy to Prod') {
-    			when { 
-    			branch 'master' 
-    			}
-   		steps {
-        input message: "Promote to Prod?"
-       		 sh '''
-         		 # Remove existing containers
-         		 docker rm -f tinyurl-prod1 tinyurl-prod2 tinyurl-prod3 tinyurl-prod4 tinyurl-prod5 || true
+            when { branch 'master' }
+            steps {
+                input message: "Promote to Prod?"
+                sh '''
+                  # Remove existing containers
+                  docker rm -f tinyurl-prod1 tinyurl-prod2 tinyurl-prod3 tinyurl-prod4 tinyurl-prod5 || true
 
-         		 # Start 5 instances on different ports
-         		 docker run -d --name tinyurl-prod1 \
-           		 --network=root_tinyurl-net \
-            	 -p 8080:8080 \
-             	 -e SPRING_PROFILES_ACTIVE=proddocker \
-                 $DOCKER_IMAGE:${BUILD_NUMBER}
+                  # Start 5 instances on different ports
+                  docker run -d --name tinyurl-prod1 \
+                    --network=root_tinyurl-net \
+                    -p 8080:8080 \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
+                    $DOCKER_IMAGE:${BUILD_NUMBER}
 
-        	     docker run -d --name tinyurl-prod2 \
-          		 --network=root_tinyurl-net \
-            	 -p 8090:8080 \
-           		 -e SPRING_PROFILES_ACTIVE=proddocker \
-            	 $DOCKER_IMAGE:${BUILD_NUMBER}
+                  docker run -d --name tinyurl-prod2 \
+                    --network=root_tinyurl-net \
+                    -p 8090:8080 \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
+                    $DOCKER_IMAGE:${BUILD_NUMBER}
 
-          		 docker run -d --name tinyurl-prod3 \
-            	 --network=root_tinyurl-net \
-            	 -p 8091:8080 \
-            	 -e SPRING_PROFILES_ACTIVE=proddocker \
-            	 $DOCKER_IMAGE:${BUILD_NUMBER}
+                  docker run -d --name tinyurl-prod3 \
+                    --network=root_tinyurl-net \
+                    -p 8091:8080 \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
+                    $DOCKER_IMAGE:${BUILD_NUMBER}
 
-          		docker run -d --name tinyurl-prod4 \
-            	--network=root_tinyurl-net \
-            	-p 8092:8080 \
-            	-e SPRING_PROFILES_ACTIVE=proddocker \
-            	$DOCKER_IMAGE:${BUILD_NUMBER}
+                  docker run -d --name tinyurl-prod4 \
+                    --network=root_tinyurl-net \
+                    -p 8092:8080 \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
+                    $DOCKER_IMAGE:${BUILD_NUMBER}
 
-          	    docker run -d --name tinyurl-prod5 \
-           	    --network=root_tinyurl-net \
-             	-p 8093:8080 \
-             	-e SPRING_PROFILES_ACTIVE=proddocker \
-             	$DOCKER_IMAGE:${BUILD_NUMBER}
-        	'''
-   			 }
-		}
-    
+                  docker run -d --name tinyurl-prod5 \
+                    --network=root_tinyurl-net \
+                    -p 8093:8080 \
+                    -e SPRING_PROFILES_ACTIVE=proddocker \
+                    $DOCKER_IMAGE:${BUILD_NUMBER}
+                '''
+            }
+        }
 
-		stage('Deploy to Prod on EC2') {
-		when { 
-    			branch 'master' 
-    			}
- 		 steps {
-   		 input message: "Promote to Prod EC2 instance?"
-  		  sshagent (credentials: ['ec2-ssh-key']) {
-     		 sh '''
-       		 ssh -o StrictHostKeyChecking=no ec2-user@13.60.183.171 '
-       		    docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
-          		docker network create root_tinyurl-net &&
-        		docker rm -f tinyurl-prod5 || true &&
-         		docker run -d --name tinyurl-prod5 \
-          		--network=root_tinyurl-net \
-           		-p 8094:8080 \
-           		-e SPRING_PROFILES_ACTIVE=proddocker \
-           		pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}
-      		  '
-      		'''
-    		}
-  		}
-	}
+        stage('Deploy to Prod on EC2') {
+            when { branch 'master' }
+            steps {
+                input message: "Promote to Prod EC2 instance?"
+                sshagent (credentials: ['ec2-ssh-key']) {
+                    sh '''
+                      ssh -o StrictHostKeyChecking=no ec2-user@13.60.183.171 '
+                        docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
+                        docker network create root_tinyurl-net &&
+                        docker rm -f tinyurl-prod5 || true &&
+                        docker run -d --name tinyurl-prod5 \
+                          --network=root_tinyurl-net \
+                          -p 8094:8080 \
+                          -e SPRING_PROFILES_ACTIVE=proddocker \
+                          pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}
+                      '
+                    '''
+                }
+            }
+        }
+    } // <- closes stages block
 
     post {
         always {
@@ -183,4 +178,3 @@ pipeline {
         }
     }
 }
-
