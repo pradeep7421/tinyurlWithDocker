@@ -156,7 +156,7 @@ pipeline {
                 input message: "Promote to Prod EC2 instance?"
                 sshagent (credentials: ['ec2-ssh-key']) {
                     sh """
-                      ssh -o StrictHostKeyChecking=no ec2-user@13.53.126.239 "
+                      ssh -o StrictHostKeyChecking=no ec2-user@13.48.29.149 "
                         docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
                         docker network create root_tinyurl-net &&
                         docker rm -f tinyurl-prod5 || true &&
