@@ -155,18 +155,18 @@ pipeline {
             steps {
                 input message: "Promote to Prod EC2 instance?"
                 sshagent (credentials: ['ec2-ssh-key']) {
-                    sh """
-                      ssh -o StrictHostKeyChecking=no ec2-user@13.48.29.149 "
+                    sh '''
+                      ssh -o StrictHostKeyChecking=no ec2-user@51.20.93.154 '
                         docker network inspect root_tinyurl-net >/dev/null 2>&1 || \
                         docker network create root_tinyurl-net &&
-                        docker rm -f tinyurl-prod5 || true &&
+                        docker rm -f tinyurl-prodec2 || true &&
                         docker run -d --name tinyurl-prod5 \
                           --network=root_tinyurl-net \
                           -p 8094:8080 \
                           -e SPRING_PROFILES_ACTIVE=proddocker \
                           pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}
-                      "
-                    """
+                      '
+                    '''
                 }
             }
         }
