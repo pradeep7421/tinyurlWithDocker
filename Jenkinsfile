@@ -152,11 +152,14 @@ pipeline {
         	'''
    			 }
 		}
-    }
+    
 
 		stage('Deploy to Prod on EC2') {
+		when { 
+    			branch 'master' 
+    			}
  		 steps {
-   		 input message: "Promote to Prod?"
+   		 input message: "Promote to Prod EC2 instance?"
   		  sshagent (credentials: ['ec2-ssh-key']) {
      		 sh '''
        		 ssh -o StrictHostKeyChecking=no ec2-user@13.60.183.171 '
@@ -172,7 +175,7 @@ pipeline {
       		'''
     		}
   		}
-		}
+	}
 
     post {
         always {
