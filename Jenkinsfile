@@ -159,9 +159,9 @@ pipeline {
         		    ssh -o StrictHostKeyChecking=no ec2-user@13.53.125.13 \\
          		   "set -e; \\
            		    sudo docker network inspect root_tinyurl-net >/dev/null 2>&1 || sudo docker network create root_tinyurl-net; \\
-           		    sudo docker rm -f tinyurl-prodec2 >/dev/null 2>&1 || true; \\
+           		    sudo docker rm -f tinyurl-prod >/dev/null 2>&1 || true; \\
            		    sudo docker pull pradeep7421/devtinyurlwithdocker:${BUILD_NUMBER}; \\
-             		sudo docker run -d --name tinyurl-prod5 \\
+             		sudo docker run -d --name tinyurl-prodec2 \\
                		--network=root_tinyurl-net \\
                		-p 8094:8080 \\
                		-e SPRING_PROFILES_ACTIVE=proddocker \\
