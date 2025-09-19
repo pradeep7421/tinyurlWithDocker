@@ -39,6 +39,18 @@ pipeline {
             }
         }
 
+		stage('Run Tests Before Deploy') {
+    			steps {
+        			echo "Running tests before build..."
+        			sh 'mvn clean test'
+    			}
+    			post {
+      		  		always {
+            			junit '**/target/surefire-reports/*.xml'
+        			}
+    			}
+			}
+
         stage('Build JAR') {
             when {
                 expression { env.BRANCH_NAME.startsWith("development") || env.BRANCH_NAME == "master" }
